@@ -224,7 +224,14 @@ def generateJson(structNames):
 
                 if entry['name'] == structName:
                     (struct, dependentStructs) = generateStructJson(offset)
-                    jsonDOM[entry['name']] = struct
+
+                    if len(struct) > 0:
+                        if structName in jsonDOM and jsonDOM[structName] != struct:
+                            print(structName + " already defined, but with content.", file=sys.stderr)
+                            print("Previously read: " + structName + ": " + str(jsonDOM[structName]), file=sys.stderr)
+                            print("New: " + structName + ": " + str(struct), file=sys.stderr)
+                        else:
+                            jsonDOM[structName] = struct
 
                     if structName not in writtenStructs:
                         writtenStructs.append(structName)

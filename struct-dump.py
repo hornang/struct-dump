@@ -304,7 +304,17 @@ jsonText = json.dumps(jsonStructure, sort_keys=True, indent=4, separators=(',', 
 
 file = open(args.o, 'w')
 file.write(jsonText)
-print("Wrote " + str(math.floor(len(jsonText) / 1024)) + ' KiB of struct data to "' + args.o +'"')
+
+size = len(jsonText)
+sizeString = ""
+
+if size < 1024:
+    sizeString = str(size) + " bytes"
+else:
+    sizeString = "approximately " + str(math.floor(size / 1024)) + " KiB"
+
+print("Wrote " + sizeString + " of struct data to \"" + args.o +"\"")
+
 file.close()
 
 

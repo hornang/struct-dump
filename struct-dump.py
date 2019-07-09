@@ -12,8 +12,7 @@ def memberOffset(input):
     match = re.match( r' .*\(DW_OP_plus_uconst: (\w+)\)', input)
 
     if not match:
-        print('Unable to extract member offset from: "' + input + '"')
-        return False
+        return int(input)
 
     return int(match.group(1))
 
@@ -110,14 +109,14 @@ def parseType(offset, properties):
 def parseEntry(file):
     line = file.readline()
 
-    match = re.match( r' <(\w+)><(\w+)>: Abbrev Number: \w+ \((\w+)\)', line)
+    match = re.match( r' <(\w+)><(\w+)>: Abbrev Number: \w+( \((\w+)\))?', line)
 
     if not match:
         return False
 
     level = int(match.group(1))
     offset = int(match.group(2), 16)
-    type = match.group(3)
+    type = match.group(4)
 
     filePosition = file.tell()
     counter = 0
@@ -128,12 +127,12 @@ def parseEntry(file):
     while line:
         if not line.startswith('    '):
             file.seek(filePosition)
-            return {'offset': offset,
-                    'level': level,
+            return {'level': level,
+                    'offset': offset,
                     'type': type,
                     'properties': properties}
 
-        match = re.match( r'    <\w+>   (\w+)\s*:(.*)', line)
+        match = re.match( r'    <\w+>   (\w+)\s*: (.*)', line)
 
         if not match:
             print("Failed to match: " + line)
@@ -307,7 +306,7 @@ else:
     cacheFile.close()
 
 jsonStructure = generateJson(structs)
-jsonText = json.dumps(jsonStructure, sort_keys=True, indent=4, separators=(',', ': '))
+jsonText = json.dumps(jsonStructure, sort_keys=False, indent=4, separators=(',', ': '))
 
 file = open(args.o, 'w')
 file.write(jsonText)
@@ -323,7 +322,6 @@ else:
 print("Wrote " + sizeString + " of struct data to \"" + args.o +"\"")
 
 file.close()
-
 
 
 
